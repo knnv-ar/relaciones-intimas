@@ -1,0 +1,21 @@
+{
+  "name": "relaciones-intimas",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build --base /relaciones-intimas/ --out dist",
+    "preview": "vite preview --outDir dist",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.14.1",
+    "@slidev/theme-default": "latest",
+    "@slidev/theme-seriph": "latest",
+    "howler": "^2.2.4",
+    "vue": "^3.5.29"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.12"
+  }
+}
