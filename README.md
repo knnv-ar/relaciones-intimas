@@ -1,4 +1,4 @@
-# Relaciones Íntimas
+# Relaciones íntimas
 
 Libro vivo de los proyectos de investigación "Relaciones íntimas" del Departamento de Artes Dramáticas de la Universidad Nacional de las Artes.
 

@@ -2,6 +2,7 @@
 title: Relaciones Íntimas
 theme: default
 colorSchema: dark
+transition: grid-nav
 layout: fullscreen-card
 image: /img/slide-01.jpg
 ---

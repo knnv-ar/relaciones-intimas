@@ -1,0 +1,36 @@
+/*
+  ─── Transiciones 2D direccionales ───────────────────────────────────────
+  Slidev aplica .grid-nav-enter-active / .grid-nav-leave-active en el
+  <Transition name="grid-nav"> que envuelve cada slide.
+  El atributo data-nav-dir en <body> indica la dirección del viaje.
+*/
+
+/* Las dos slides (saliente y entrante) se posicionan absolutas durante la transición */
+.grid-nav-enter-active,
+.grid-nav-leave-active {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity   0.45s ease;
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+/* ── Derecha: nueva slide entra desde la derecha, vieja sale hacia la izquierda ── */
+body[data-nav-dir="right"] .grid-nav-enter-from { transform: translateX(100%);  opacity: 0.6; }
+body[data-nav-dir="right"] .grid-nav-leave-to   { transform: translateX(-100%); opacity: 0.6; }
+
+/* ── Izquierda: nueva slide entra desde la izquierda ── */
+body[data-nav-dir="left"]  .grid-nav-enter-from { transform: translateX(-100%); opacity: 0.6; }
+body[data-nav-dir="left"]  .grid-nav-leave-to   { transform: translateX(100%);  opacity: 0.6; }
+
+/* ── Abajo: nueva slide entra desde abajo ── */
+body[data-nav-dir="down"]  .grid-nav-enter-from { transform: translateY(100%);  opacity: 0.6; }
+body[data-nav-dir="down"]  .grid-nav-leave-to   { transform: translateY(-100%); opacity: 0.6; }
+
+/* ── Arriba: nueva slide entra desde arriba ── */
+body[data-nav-dir="up"]    .grid-nav-enter-from { transform: translateY(-100%); opacity: 0.6; }
+body[data-nav-dir="up"]    .grid-nav-leave-to   { transform: translateY(100%);  opacity: 0.6; }
+
+/* Estado neutro (sin data-nav-dir): fade simple como fallback */
+body:not([data-nav-dir]) .grid-nav-enter-from,
+body:not([data-nav-dir]) .grid-nav-leave-to { opacity: 0; }

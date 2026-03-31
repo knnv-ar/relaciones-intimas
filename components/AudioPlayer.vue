@@ -1,8 +1,6 @@
 <template>
   <div class="audio-player">
-    <button class="btn" @click="rewind" title="Rebobinar">
-      ⏮
-    </button>
+    <button class="btn" @click="rewind" title="Rebobinar">⏮</button>
     <button class="btn play-btn" @click="togglePlay" title="Play / Pause">
       <span v-if="!isPlaying">▶</span>
       <span v-else>⏸</span>
@@ -22,10 +20,10 @@ const props = defineProps({
   src: { type: String, required: true }
 })
 
-const isPlaying = ref(false)
-const progress = ref(0)
+const isPlaying  = ref(false)
+const progress   = ref(0)
 const currentTime = ref('0:00')
-const duration = ref('0:00')
+const duration   = ref('0:00')
 let sound = null
 let rafId = null
 
@@ -38,10 +36,19 @@ const formatTime = (secs) => {
 const updateProgress = () => {
   if (sound && isPlaying.value) {
     const seek = sound.seek() || 0
-    const dur = sound.duration() || 1
-    progress.value = (seek / dur) * 100
+    const dur  = sound.duration() || 1
+    progress.value    = (seek / dur) * 100
     currentTime.value = formatTime(seek)
     rafId = requestAnimationFrame(updateProgress)
+  }
+}
+
+// ← NEW: parar este player cuando otro slide pida silencio
+const stopHandler = () => {
+  if (isPlaying.value) {
+    sound?.pause()
+    isPlaying.value = false
+    cancelAnimationFrame(rafId)
   }
 }
 
@@ -49,20 +56,23 @@ onMounted(() => {
   sound = new Howl({
     src: [props.src],
     html5: true,
-    onload: () => {
-      duration.value = formatTime(sound.duration())
-    },
+    onload: () => { duration.value = formatTime(sound.duration()) },
     onend: () => {
-      isPlaying.value = false
-      progress.value = 0
+      isPlaying.value   = false
+      progress.value    = 0
       currentTime.value = '0:00'
     }
   })
+
+  // ← NEW: escuchar el evento global de parada
+  window.addEventListener('grid:stop-audio', stopHandler)
 })
 
 onUnmounted(() => {
   cancelAnimationFrame(rafId)
   sound?.unload()
+  // ← NEW: limpiar el listener para evitar memory leaks
+  window.removeEventListener('grid:stop-audio', stopHandler)
 })
 
 const togglePlay = () => {
@@ -79,7 +89,7 @@ const togglePlay = () => {
 
 const rewind = () => {
   sound.seek(0)
-  progress.value = 0
+  progress.value    = 0
   currentTime.value = '0:00'
   if (!isPlaying.value) {
     sound.play()
@@ -89,7 +99,7 @@ const rewind = () => {
 }
 
 const seek = (e) => {
-  const rect = e.currentTarget.getBoundingClientRect()
+  const rect  = e.currentTarget.getBoundingClientRect()
   const ratio = (e.clientX - rect.left) / rect.width
   sound.seek(ratio * sound.duration())
 }
@@ -107,32 +117,18 @@ const seek = (e) => {
   width: fit-content;
   color: white;
   font-size: 0.85rem;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.btn {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0 4px;
-  transition: transform 0.1s;
-}
+.btn { background: none; border: none; color: white; cursor: pointer; font-size: 1.1rem; padding: 0 4px; transition: transform 0.1s; }
 .btn:hover { transform: scale(1.2); }
 .play-btn { font-size: 1.3rem; }
 .progress-bar {
   width: 120px;
   height: 4px;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   cursor: pointer;
-  position: relative;
 }
-.progress-fill {
-  height: 100%;
-  background: white;
-  border-radius: 2px;
-  transition: width 0.1s linear;
-}
+.progress-fill { height: 100%; background: white; border-radius: 2px; transition: width 0.1s linear; }
 .time { font-size: 0.75rem; opacity: 0.8; white-space: nowrap; }
 </style>
