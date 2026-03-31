@@ -81,26 +81,16 @@ const onKey = (e) => {
 let touchStart = null
 const SWIPE_THRESHOLD = 50
 
+// passive: true — solo registrar posición, no necesitamos bloquear nada acá
 const onTouchStart = (e) => {
   touchStart = {
     x: e.touches[0].clientX,
     y: e.touches[0].clientY,
-    blocked: false,
   }
 }
 
-// Intercepta en capture para que Slidev no reciba gestos horizontales
-const onTouchMove = (e) => {
-  if (!touchStart) return
-  const dx = Math.abs(e.touches[0].clientX - touchStart.x)
-  const dy = Math.abs(e.touches[0].clientY - touchStart.y)
-  if (dx > dy && dx > 10) {
-    e.preventDefault()
-    e.stopImmediatePropagation()
-    touchStart.blocked = true
-  }
-}
-
+// capture: true + passive: false → se ejecuta ANTES que el handler de Slidev
+// y puede llamar stopImmediatePropagation para que Slidev nunca lo vea
 const onTouchEnd = (e) => {
   if (!touchStart) return
   const dx = e.changedTouches[0].clientX - touchStart.x
@@ -108,9 +98,15 @@ const onTouchEnd = (e) => {
   touchStart = null
 
   if (Math.abs(dx) > Math.abs(dy)) {
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return
+    // Gesto horizontal → bloqueamos Slidev y manejamos nosotros
+    if (Math.abs(dx) < SWIPE_THRESHOLD) {
+      e.stopImmediatePropagation() // bloquear igual aunque no navegue
+      return
+    }
+    e.stopImmediatePropagation()   // ← Slidev nunca recibe este touchend
     navigate(dx > 0 ? 'left' : 'right')
   } else {
+    // Gesto vertical → Slidev no tiene handler, no necesitamos bloquear
     if (Math.abs(dy) < SWIPE_THRESHOLD) return
     navigate(dy > 0 ? 'up' : 'down')
   }
@@ -120,15 +116,14 @@ const onTouchEnd = (e) => {
 onMounted(() => {
   window.addEventListener('keydown',    onKey,        true)
   window.addEventListener('touchstart', onTouchStart, { passive: true })
-  window.addEventListener('touchmove',  onTouchMove,  { passive: false, capture: true })
-  window.addEventListener('touchend',   onTouchEnd,   { passive: true })
+  // capture: true = fase de captura, passive: false = puede llamar stopImmediatePropagation
+  window.addEventListener('touchend',   onTouchEnd,   { capture: true, passive: false })
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown',    onKey,        true)
   window.removeEventListener('touchstart', onTouchStart)
-  window.removeEventListener('touchmove',  onTouchMove,  { capture: true })
-  window.removeEventListener('touchend',   onTouchEnd)
+  window.removeEventListener('touchend',   onTouchEnd,   { capture: true })
 })
 </script>
 
