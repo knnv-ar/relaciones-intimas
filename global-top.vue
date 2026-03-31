@@ -23,13 +23,10 @@ const { currentPage, go, total } = useNav()
 
 const totalRows = computed(() => Math.ceil(total.value / COLS))
 
-const getPos   = (page) => ({ row: Math.floor((page - 1) / COLS), col: (page - 1) % COLS })
-const getPage  = (row, col) => row * COLS + col + 1
-const isActive = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
+const getPos      = (page) => ({ row: Math.floor((page - 1) / COLS), col: (page - 1) % COLS })
+const getPage     = (row, col) => row * COLS + col + 1
+const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
 const slideExists = (row, col) => { const p = getPage(row, col); return p >= 1 && p <= total.value }
-
-// ─── Opuestos para "enter from" ───────────────────────────
-const OPPOSITE = { right: 'left', left: 'right', down: 'up', up: 'down' }
 
 // ─── Navegar ─────────────────────────────────────────────
 const navigate = (dir) => {
@@ -52,20 +49,14 @@ const navigate = (dir) => {
   const target = getPage(next.row, next.col)
   if (target < 1 || target > total.value) return
 
-  // ← NEW: detener todo audio activo antes de cambiar de slide
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
-
-  // ← NEW: indicar la dirección al sistema de transiciones CSS
-  // "dir" es hacia donde va el usuario → la slide nueva ENTRA desde el opuesto
   document.body.dataset.navDir = dir
-
   go(target)
 }
 
 const goTo = (row, col) => {
   if (!slideExists(row, col)) return
-  // Para clicks en el minimap calculamos dirección relativa
-  const cur = getPos(currentPage.value)
+  const cur  = getPos(currentPage.value)
   const dCol = col - cur.col
   const dRow = row - cur.row
   let dir = 'right'
@@ -91,7 +82,23 @@ let touchStart = null
 const SWIPE_THRESHOLD = 50
 
 const onTouchStart = (e) => {
-  touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  touchStart = {
+    x: e.touches[0].clientX,
+    y: e.touches[0].clientY,
+    blocked: false,
+  }
+}
+
+// Intercepta en capture para que Slidev no reciba gestos horizontales
+const onTouchMove = (e) => {
+  if (!touchStart) return
+  const dx = Math.abs(e.touches[0].clientX - touchStart.x)
+  const dy = Math.abs(e.touches[0].clientY - touchStart.y)
+  if (dx > dy && dx > 10) {
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    touchStart.blocked = true
+  }
 }
 
 const onTouchEnd = (e) => {
@@ -113,12 +120,14 @@ const onTouchEnd = (e) => {
 onMounted(() => {
   window.addEventListener('keydown',    onKey,        true)
   window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchmove',  onTouchMove,  { passive: false, capture: true })
   window.addEventListener('touchend',   onTouchEnd,   { passive: true })
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown',    onKey,        true)
   window.removeEventListener('touchstart', onTouchStart)
+  window.removeEventListener('touchmove',  onTouchMove,  { capture: true })
   window.removeEventListener('touchend',   onTouchEnd)
 })
 </script>
@@ -149,5 +158,5 @@ onUnmounted(() => {
   transition: all 0.2s ease;
 }
 .indicator-dot.exists:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.2); }
-.indicator-dot.active { background: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); transform: scale(1.3); }
+.indicator-dot.active       { background: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); transform: scale(1.3); }
 </style>
