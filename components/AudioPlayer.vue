@@ -13,17 +13,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Howl } from 'howler'
 
 const props = defineProps({
   src: { type: String, required: true }
 })
 
-const isPlaying  = ref(false)
-const progress   = ref(0)
+// ← Resuelve la ruta tanto en local como en GitHub Pages
+const fullSrc = computed(() => {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = props.src.startsWith('/') ? props.src : '/' + props.src
+  return base + path
+})
+
+const isPlaying   = ref(false)
+const progress    = ref(0)
 const currentTime = ref('0:00')
-const duration   = ref('0:00')
+const duration    = ref('0:00')
 let sound = null
 let rafId = null
 
@@ -43,7 +50,6 @@ const updateProgress = () => {
   }
 }
 
-// ← NEW: parar este player cuando otro slide pida silencio
 const stopHandler = () => {
   if (isPlaying.value) {
     sound?.pause()
@@ -54,7 +60,7 @@ const stopHandler = () => {
 
 onMounted(() => {
   sound = new Howl({
-    src: [props.src],
+    src: [fullSrc.value],   // ← usa la ruta resuelta
     html5: true,
     onload: () => { duration.value = formatTime(sound.duration()) },
     onend: () => {
@@ -63,15 +69,12 @@ onMounted(() => {
       currentTime.value = '0:00'
     }
   })
-
-  // ← NEW: escuchar el evento global de parada
   window.addEventListener('grid:stop-audio', stopHandler)
 })
 
 onUnmounted(() => {
   cancelAnimationFrame(rafId)
   sound?.unload()
-  // ← NEW: limpiar el listener para evitar memory leaks
   window.removeEventListener('grid:stop-audio', stopHandler)
 })
 

@@ -1,7 +1,7 @@
 <template>
   <div
     class="fullscreen-card"
-    :style="image ? { backgroundImage: `url('${image}')` } : {}"
+    :style="fullImageUrl ? { backgroundImage: `url('${fullImageUrl}')` } : {}"
   >
     <div class="overlay" />
     <div class="content">
@@ -11,8 +11,18 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   image: { type: String, default: '' },
+})
+
+// ← Resuelve la ruta tanto en local (base="/") como en GitHub Pages (base="/relaciones-intimas/")
+const fullImageUrl = computed(() => {
+  if (!props.image) return ''
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = props.image.startsWith('/') ? props.image : '/' + props.image
+  return base + path
 })
 </script>
 
@@ -28,7 +38,6 @@ defineProps({
   align-items: flex-end;
   overflow: hidden;
 }
-
 .overlay {
   position: absolute;
   inset: 0;
@@ -39,7 +48,6 @@ defineProps({
     rgba(0, 0, 0, 0.10) 100%
   );
 }
-
 .content {
   position: relative;
   z-index: 1;
@@ -47,8 +55,6 @@ defineProps({
   width: 100%;
   color: white;
 }
-
-/* Tipografía del slot */
 .content :deep(h1) {
   color: white;
   font-size: 2.8rem;
@@ -57,7 +63,6 @@ defineProps({
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   line-height: 1.1;
 }
-
 .content :deep(p) {
   color: rgba(255, 255, 255, 0.88);
   font-size: 1.25rem;
@@ -65,7 +70,5 @@ defineProps({
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
   line-height: 1.5;
 }
-
-/* Ocultar elementos de navegación propios de Slidev */
 :deep(.slidev-nav) { display: none !important; }
 </style>
