@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, watch, onMounted, onUnmounted } from 'vue'
 import { useNav } from '@slidev/client'
 
 const COLS = 3
@@ -27,6 +27,18 @@ const getPos      = (page) => ({ row: Math.floor((page - 1) / COLS), col: (page 
 const getPage     = (row, col) => row * COLS + col + 1
 const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
 const slideExists = (row, col) => { const p = getPage(row, col); return p >= 1 && p <= total.value }
+
+// ─── Corrección reactiva ──────────────────────────────────
+// Si Slidev nos mueve a una página distinta a la que queríamos
+// (por su propio handler de swipe), corregimos inmediatamente.
+let intendedPage = null
+let correctionTimer = null
+
+watch(currentPage, (newPage) => {
+  if (intendedPage !== null && newPage !== intendedPage) {
+    go(intendedPage)
+  }
+})
 
 // ─── Navegar ─────────────────────────────────────────────
 const navigate = (dir) => {
@@ -49,6 +61,12 @@ const navigate = (dir) => {
   const target = getPage(next.row, next.col)
   if (target < 1 || target > total.value) return
 
+  // Registrar intención ANTES de llamar go()
+  intendedPage = target
+  clearTimeout(correctionTimer)
+  // Limpiar la intención después de que cualquier corrección ya ocurrió
+  correctionTimer = setTimeout(() => { intendedPage = null }, 500)
+
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
   document.body.dataset.navDir = dir
   go(target)
@@ -62,6 +80,10 @@ const goTo = (row, col) => {
   let dir = 'right'
   if      (Math.abs(dCol) >= Math.abs(dRow)) dir = dCol >= 0 ? 'right' : 'left'
   else                                        dir = dRow >= 0 ? 'down'  : 'up'
+
+  intendedPage = getPage(row, col)
+  clearTimeout(correctionTimer)
+  correctionTimer = setTimeout(() => { intendedPage = null }, 500)
 
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
   document.body.dataset.navDir = dir
@@ -81,7 +103,6 @@ const onKey = (e) => {
 let touchStart = null
 const SWIPE_THRESHOLD = 50
 
-// passive: true — solo registrar posición, no necesitamos bloquear nada acá
 const onTouchStart = (e) => {
   touchStart = {
     x: e.touches[0].clientX,
@@ -89,8 +110,6 @@ const onTouchStart = (e) => {
   }
 }
 
-// capture: true + passive: false → se ejecuta ANTES que el handler de Slidev
-// y puede llamar stopImmediatePropagation para que Slidev nunca lo vea
 const onTouchEnd = (e) => {
   if (!touchStart) return
   const dx = e.changedTouches[0].clientX - touchStart.x
@@ -98,15 +117,9 @@ const onTouchEnd = (e) => {
   touchStart = null
 
   if (Math.abs(dx) > Math.abs(dy)) {
-    // Gesto horizontal → bloqueamos Slidev y manejamos nosotros
-    if (Math.abs(dx) < SWIPE_THRESHOLD) {
-      e.stopImmediatePropagation() // bloquear igual aunque no navegue
-      return
-    }
-    e.stopImmediatePropagation()   // ← Slidev nunca recibe este touchend
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return
     navigate(dx > 0 ? 'left' : 'right')
   } else {
-    // Gesto vertical → Slidev no tiene handler, no necesitamos bloquear
     if (Math.abs(dy) < SWIPE_THRESHOLD) return
     navigate(dy > 0 ? 'up' : 'down')
   }
@@ -116,14 +129,14 @@ const onTouchEnd = (e) => {
 onMounted(() => {
   window.addEventListener('keydown',    onKey,        true)
   window.addEventListener('touchstart', onTouchStart, { passive: true })
-  // capture: true = fase de captura, passive: false = puede llamar stopImmediatePropagation
-  window.addEventListener('touchend',   onTouchEnd,   { capture: true, passive: false })
+  window.addEventListener('touchend',   onTouchEnd,   { passive: true })
 })
 
 onUnmounted(() => {
+  clearTimeout(correctionTimer)
   window.removeEventListener('keydown',    onKey,        true)
   window.removeEventListener('touchstart', onTouchStart)
-  window.removeEventListener('touchend',   onTouchEnd,   { capture: true })
+  window.removeEventListener('touchend',   onTouchEnd)
 })
 </script>
 
@@ -155,3 +168,4 @@ onUnmounted(() => {
 .indicator-dot.exists:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.2); }
 .indicator-dot.active       { background: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); transform: scale(1.3); }
 </style>
+```
