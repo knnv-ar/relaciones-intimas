@@ -14,42 +14,32 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useNav } from '@slidev/client'
 
 const COLS = 3
 
 const { currentPage, go, total } = useNav()
 
-const totalRows = computed(() => Math.ceil(total.value / COLS))
-
+const totalRows   = computed(() => Math.ceil(total.value / COLS))
 const getPos      = (page) => ({ row: Math.floor((page - 1) / COLS), col: (page - 1) % COLS })
 const getPage     = (row, col) => row * COLS + col + 1
 const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
 const slideExists = (row, col) => { const p = getPage(row, col); return p >= 1 && p <= total.value }
 
-// ─── Corrección reactiva ──────────────────────────────────
-// Si Slidev nos mueve a una página distinta a la que queríamos
-// (por su propio handler de swipe), corregimos inmediatamente.
-let intendedPage = null
-let correctionTimer = null
+// ─── Navegar desde una página específica (no desde currentPage) ──────────
+// fromPage es el snapshot tomado al inicio del gesto, ANTES de que
+// Slidev pueda modificar currentPage con su propio handler.
+const navigateFrom = (dir, fromPage) => {
+  const { row, col } = getPos(fromPage)
 
-watch(currentPage, (newPage) => {
-  if (intendedPage !== null && newPage !== intendedPage) {
-    go(intendedPage)
+  const targets = {
+    right: { row,     col: col + 1 },
+    left:  { row,     col: col - 1 },
+    down:  { row: row + 1, col     },
+    up:    { row: row - 1, col     },
   }
-})
-
-// ─── Navegar ─────────────────────────────────────────────
-const navigate = (dir) => {
-  const { row, col } = getPos(currentPage.value)
-
-  const next = {
-    right: { row, col: col + 1 },
-    left:  { row, col: col - 1 },
-    down:  { row: row + 1, col },
-    up:    { row: row - 1, col },
-  }[dir]
+  const next = targets[dir]
 
   if (
     next.row < 0 ||
@@ -61,16 +51,13 @@ const navigate = (dir) => {
   const target = getPage(next.row, next.col)
   if (target < 1 || target > total.value) return
 
-  // Registrar intención ANTES de llamar go()
-  intendedPage = target
-  clearTimeout(correctionTimer)
-  // Limpiar la intención después de que cualquier corrección ya ocurrió
-  correctionTimer = setTimeout(() => { intendedPage = null }, 500)
-
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
   document.body.dataset.navDir = dir
   go(target)
 }
+
+// Wrapper para teclado y minimap que lee currentPage en el momento
+const navigate = (dir) => navigateFrom(dir, currentPage.value)
 
 const goTo = (row, col) => {
   if (!slideExists(row, col)) return
@@ -81,16 +68,13 @@ const goTo = (row, col) => {
   if      (Math.abs(dCol) >= Math.abs(dRow)) dir = dCol >= 0 ? 'right' : 'left'
   else                                        dir = dRow >= 0 ? 'down'  : 'up'
 
-  intendedPage = getPage(row, col)
-  clearTimeout(correctionTimer)
-  correctionTimer = setTimeout(() => { intendedPage = null }, 500)
-
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
   document.body.dataset.navDir = dir
   go(getPage(row, col))
 }
 
-// ─── Teclado ─────────────────────────────────────────────
+// ─── Teclado ─────────────────────────────────────────────────────────────
+// El teclado no tiene conflicto con Slidev porque usamos capture + stopImmediatePropagation
 const onKey = (e) => {
   const map = { ArrowRight: 'right', ArrowLeft: 'left', ArrowDown: 'down', ArrowUp: 'up' }
   if (!map[e.key]) return
@@ -99,33 +83,46 @@ const onKey = (e) => {
   navigate(map[e.key])
 }
 
-// ─── Swipe táctil ────────────────────────────────────────
+// ─── Swipe táctil ────────────────────────────────────────────────────────
 let touchStart = null
 const SWIPE_THRESHOLD = 50
 
 const onTouchStart = (e) => {
   touchStart = {
-    x: e.touches[0].clientX,
-    y: e.touches[0].clientY,
+    x:    e.touches[0].clientX,
+    y:    e.touches[0].clientY,
+    page: currentPage.value,  // ← SNAPSHOT de la página ANTES de cualquier handler
   }
 }
 
 const onTouchEnd = (e) => {
   if (!touchStart) return
-  const dx = e.changedTouches[0].clientX - touchStart.x
-  const dy = e.changedTouches[0].clientY - touchStart.y
+  const dx       = e.changedTouches[0].clientX - touchStart.x
+  const dy       = e.changedTouches[0].clientY - touchStart.y
+  const fromPage = touchStart.page   // ← página real de inicio del gesto
   touchStart = null
 
-  if (Math.abs(dx) > Math.abs(dy)) {
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return
-    navigate(dx > 0 ? 'left' : 'right')
-  } else {
-    if (Math.abs(dy) < SWIPE_THRESHOLD) return
-    navigate(dy > 0 ? 'up' : 'down')
-  }
+  // ─── Diferir con setTimeout(0) ────────────────────────────────────────
+  // Esto garantiza que el handler de Slidev (sincrónico) dispare PRIMERO.
+  // Cuando nuestro handler corre, Slidev ya navegó desde fromPage a fromPage±1.
+  // Nosotros también navegamos a fromPage±1 → go() detecta que ya estamos
+  // ahí y no produce una segunda transición. Sin setTimeout, nuestro handler
+  // correría ANTES que Slidev, Slidev leería el currentPage ya actualizado
+  // por nosotros y navegaría un paso más → doble salto.
+  setTimeout(() => {
+    if (Math.abs(dx) > Math.abs(dy)) {
+      // Gesto horizontal
+      if (Math.abs(dx) < SWIPE_THRESHOLD) return
+      navigateFrom(dx > 0 ? 'left' : 'right', fromPage)
+    } else {
+      // Gesto vertical — Slidev no tiene handler vertical, no hay conflicto
+      if (Math.abs(dy) < SWIPE_THRESHOLD) return
+      navigateFrom(dy > 0 ? 'up' : 'down', fromPage)
+    }
+  }, 0)
 }
 
-// ─── Lifecycle ───────────────────────────────────────────
+// ─── Lifecycle ───────────────────────────────────────────────────────────
 onMounted(() => {
   window.addEventListener('keydown',    onKey,        true)
   window.addEventListener('touchstart', onTouchStart, { passive: true })
@@ -133,7 +130,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  clearTimeout(correctionTimer)
   window.removeEventListener('keydown',    onKey,        true)
   window.removeEventListener('touchstart', onTouchStart)
   window.removeEventListener('touchend',   onTouchEnd)
