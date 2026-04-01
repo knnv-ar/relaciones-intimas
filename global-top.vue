@@ -27,6 +27,20 @@ const getPage     = (row, col) => row * COLS + col + 1
 const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
 const slideExists = (row, col) => { const p = getPage(row, col); return p >= 1 && p <= total.value }
 
+// ─── Limpiar data-nav-dir tras la transición ─────────────
+// NO usamos transitionend porque se dispara en TODOS los elementos
+// (dots, botones, overlays) mucho antes que termine la transición
+// principal del slide (450ms), cayendo al fade fallback.
+let navDirTimer = null
+
+const setNavDir = (dir) => {
+  document.body.dataset.navDir = dir
+  clearTimeout(navDirTimer)
+  navDirTimer = setTimeout(() => {
+    delete document.body.dataset.navDir
+  }, 500) // 500ms > 450ms de la transición CSS en style.css
+}
+
 // ─── Navegar desde un snapshot de página ─────────────────
 const navigateFrom = (dir, fromPage) => {
   const { row, col } = getPos(fromPage)
@@ -53,7 +67,7 @@ const navigateFrom = (dir, fromPage) => {
 }
 
 const navigate = (dir) => {
-  document.body.dataset.navDir = dir
+  setNavDir(dir)
   navigateFrom(dir, currentPage.value)
 }
 
@@ -67,7 +81,7 @@ const goTo = (row, col) => {
   else                                        dir = dRow >= 0 ? 'down'  : 'up'
 
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
-  document.body.dataset.navDir = dir
+  setNavDir(dir)
   go(getPage(row, col))
 }
 
@@ -108,7 +122,7 @@ const onTouchEnd = (e) => {
 
   if (!dir) return
 
-  document.body.dataset.navDir = dir
+  setNavDir(dir)   // ← síncrono: la transición CSS ya tiene la dirección correcta
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
 
   setTimeout(() => {
@@ -116,26 +130,18 @@ const onTouchEnd = (e) => {
   }, 0)
 }
 
-// ─── Limpiar data-nav-dir al terminar la transición ──────
-// Sin esto, el valor anterior persiste y la próxima transición
-// en distinta dirección lee el valor viejo durante un frame.
-const onTransitionEnd = () => {
-  delete document.body.dataset.navDir
-}
-
 // ─── Lifecycle ───────────────────────────────────────────
 onMounted(() => {
-  window.addEventListener('keydown',       onKey,           true)
-  window.addEventListener('touchstart',    onTouchStart,    { passive: true })
-  window.addEventListener('touchend',      onTouchEnd,      { passive: true })
-  window.addEventListener('transitionend', onTransitionEnd)
+  window.addEventListener('keydown',    onKey,        true)
+  window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchend',   onTouchEnd,   { passive: true })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown',       onKey,           true)
-  window.removeEventListener('touchstart',    onTouchStart)
-  window.removeEventListener('touchend',      onTouchEnd)
-  window.removeEventListener('transitionend', onTransitionEnd)
+  clearTimeout(navDirTimer)
+  window.removeEventListener('keydown',    onKey,        true)
+  window.removeEventListener('touchstart', onTouchStart)
+  window.removeEventListener('touchend',   onTouchEnd)
 })
 </script>
 
@@ -167,3 +173,18 @@ onUnmounted(() => {
 .indicator-dot.exists:hover { background: rgba(255, 255, 255, 0.5); transform: scale(1.2); }
 .indicator-dot.active       { background: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); transform: scale(1.3); }
 </style>
+```
+
+---
+
+## Resumen del bug y el fix
+```
+ANTES (bug):
+  setea data-nav-dir = "right"
+  dot.transitionend (200ms) → borra data-nav-dir   ← demasiado pronto!
+  slide.transition (450ms)  → lee body sin atributo → fade fallback ✗
+
+AHORA:
+  setNavDir("right") → data-nav-dir = "right"
+  setTimeout(500ms)  → borra data-nav-dir           ← después de los 450ms ✓
+  slide.transition (450ms) → lee "right" → slide-right ✓
