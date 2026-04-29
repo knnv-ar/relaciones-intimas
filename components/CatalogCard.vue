@@ -33,49 +33,49 @@
 import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
-  scale: { type: Number, default: 1   },
-  align: { type: String, default: 'center' }, // 'left' | 'center' | 'right'
+  scale: { type: Number, default: 1 },
 })
 
 const inner         = ref(null)
 const naturalHeight = ref(0)
+const naturalWidth  = ref(0)
 
 onMounted(() => {
   naturalHeight.value = inner.value.offsetHeight
+  naturalWidth.value  = inner.value.offsetWidth
 })
 
+// El outer reserva exactamente el espacio escalado para que
+// el contenido de abajo no se solape
 const outerStyle = computed(() => ({
-  height:         naturalHeight.value
-                    ? `${naturalHeight.value * props.scale}px`
-                    : 'auto',
-  width:          '100%',
-  overflow:       'visible',
-  display:        'flex',
-  justifyContent: props.align === 'left'  ? 'flex-start' :
-                  props.align === 'right' ? 'flex-end'   : 'center',
+  height:   naturalHeight.value ? `${naturalHeight.value * props.scale}px` : 'auto',
+  width:    naturalWidth.value  ? `${naturalWidth.value  * props.scale}px` : 'auto',
+  overflow: 'visible',
+  flexShrink: 0,
 }))
 
 const innerStyle = computed(() => ({
   transform:       `scale(${props.scale})`,
-  transformOrigin: `top ${props.align === 'left'  ? 'left'  :
-                          props.align === 'right' ? 'right' : 'center'}`,
-  width: '100%',
+  transformOrigin: 'top left',   // ← ancla en esquina superior izquierda
+  display:         'inline-block',
+  width:           '580px',      // ancho fijo del card, no hereda el 100% del padre
 }))
 </script>
 
 <style scoped>
-.catalog-outer { }
+.catalog-outer {
+  display: block;   /* bloque normal, fluye a la izquierda naturalmente */
+}
 
 .catalog-inner {
-  width: 100%;
+  /* inline-block via :style → se encoge al ancho del contenido */
 }
 
 .card {
   background: transparent;
   border: 1.5px solid currentColor;
   padding: 1.4rem 1.6rem 1.3rem 1.6rem;
-  max-width: 580px;
-  width: 100%;
+  width: 580px;
   line-height: 1.55;
   box-shadow: none;
   font-family: 'Linux Libertine', 'Times New Roman', Georgia, serif;

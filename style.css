@@ -52,3 +52,21 @@ body:not([data-nav-dir]) .grid-nav-leave-to { opacity: 0; }
 html:not(.dark) .slide-logo {
   filter: invert(1);
 }
+
+/* ─── Texto de créditos debajo del CatalogCard ──────────── */
+.credits {
+  font-size: 0.6rem;   /* ← acá controlás el tamaño de todo el bloque */
+  line-height: 1.0;
+}
+
+.credits p,
+.credits h5 {
+  margin: 0 0 0.15em !important;
+  font-size: inherit !important;
+  text-shadow: none !important;
+}
+
+/* Separador mínimo entre bloques de créditos */
+.credits .gap {
+  margin-top: 0.6em;  /* ← ajustá este valor a gusto */
+}

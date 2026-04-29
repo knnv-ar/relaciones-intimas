@@ -18,30 +18,49 @@ layout: statement
 layout: fullscreen-card
 ---
 
-<CatalogCard :scale="0.5" />
+<CatalogCard :scale="0.6" />
 
-##### © 2026, Luciana Estévez
-
-##### © 2026, de la presente edición: Universidad Nacional de las Artes
+<div class="credits">
 
 <br>
 
-##### **Directora del proyecto de investigación:** Luciana Estévez
+© 2026, Luciana Estévez
 
-##### **Codirector del proyecto de investigación:** Raúl Federico Lacabanne
-
-<br>
-
-##### Autores: Ezequiel Abregú, Pedro Antony, Federico Barabino, Mirna Barreiro, Alan Bray, María Eugenia Cappellari,  Luciana Estévez, Laura Figueiras, Ayelén Guarino, Mauricio Gutiérrez, Euge Carla Jerez Ferrante, Julieta Koop, Raúl Federico Lacabanne, María Agustina Mirás, Juan Ramos, Carla Rímola, Natalia Monserrat Rodríguez, Santiago Tula y Sebastián Zavatarelli.
+© 2026, de la presente edición: Universidad Nacional de las Artes
 
 <br>
 
-##### **Diseño editorial:** Raúl Federico Lacabanne
-
-##### **Corrección de estilo:** Liliana Belinco
+**Departamento de Artes Dramáticas** (Universidad Nacional de las Artes). French 3614. C1425AXD. Ciudad Autónoma de Buenos Aires. Teléfono: (54.11) 4962-6044. URL: https://dramaticas.una.edu.ar
 
 <br>
 
+**Directora del proyecto de investigación:** Luciana Estévez
+
+**Codirector del proyecto de investigación:** Raúl Federico Lacabanne
+
+<br>
+
+**Autores:** Ezequiel Abregú, Pedro Antony, Federico Barabino, Mirna Barreiro, Alan Bray, María Eugenia Cappellari, Luciana Estévez, Laura Figueiras, Ayelén Guarino, Mauricio Gutiérrez, Euge Carla Jerez Ferrante, Julieta Koop, Raúl Federico Lacabanne, María Agustina Mirás, Juan Ramos, Carla Rímola, Natalia Monserrat Rodríguez, Santiago Tula y Sebastián Zavatarelli.
+
+<br>
+
+**Diseño editorial:** Raúl Federico Lacabanne
+
+**Corrección de estilo:** Liliana Belinco
+
+<br>
+
+Queda hecho el depósito que marca la Ley 11.723.
+
+<br>
+
+No se permite la reproducción total o parcial de este libro, en cualquier forma o por cualquier medio,<br>sin el permiso previo y por escrito de los titulares del copyright.
+
+<br>
+
+**Hecho en Argentina**
+
+</div>
 
 ---
 layout: fullscreen-card
