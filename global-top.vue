@@ -27,10 +27,7 @@ const getPage     = (row, col) => row * COLS + col + 1
 const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }
 const slideExists = (row, col) => { const p = getPage(row, col); return p >= 1 && p <= total.value }
 
-// ─── Limpiar data-nav-dir tras la transición ─────────────
-// NO usamos transitionend porque se dispara en TODOS los elementos
-// (dots, botones, overlays) mucho antes que termine la transición
-// principal del slide (450ms), cayendo al fade fallback.
+// ─── Gestión de data-nav-dir ──────────────────────────────
 let navDirTimer = null
 
 const setNavDir = (dir) => {
@@ -38,13 +35,12 @@ const setNavDir = (dir) => {
   clearTimeout(navDirTimer)
   navDirTimer = setTimeout(() => {
     delete document.body.dataset.navDir
-  }, 500) // 500ms > 450ms de la transición CSS en style.css
+  }, 500)
 }
 
-// ─── Navegar desde un snapshot de página ─────────────────
-const navigateFrom = (dir, fromPage) => {
+// ─── Calcular página destino sin navegar ──────────────────
+const getTarget = (dir, fromPage) => {
   const { row, col } = getPos(fromPage)
-
   const next = {
     right: { row,     col: col + 1 },
     left:  { row,     col: col - 1 },
@@ -57,11 +53,16 @@ const navigateFrom = (dir, fromPage) => {
     next.col < 0 ||
     next.col >= COLS ||
     next.row >= totalRows.value
-  ) return
+  ) return null
 
   const target = getPage(next.row, next.col)
-  if (target < 1 || target > total.value) return
+  return (target >= 1 && target <= total.value) ? target : null
+}
 
+// ─── Navegar ──────────────────────────────────────────────
+const navigateFrom = (dir, fromPage) => {
+  const target = getTarget(dir, fromPage)
+  if (target === null) return
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
   go(target)
 }
@@ -97,43 +98,72 @@ const onKey = (e) => {
 // ─── Swipe táctil ────────────────────────────────────────
 let touchStart = null
 const SWIPE_THRESHOLD = 50
+const DIR_DETECT_PX   = 12
 
 const onTouchStart = (e) => {
   touchStart = {
     x:    e.touches[0].clientX,
     y:    e.touches[0].clientY,
     page: currentPage.value,
+    dir:  null,
   }
+}
+
+// Detectar dirección en touchmove para que data-nav-dir esté
+// presente antes de que touchend dispare la transición
+const onTouchMove = (e) => {
+  if (!touchStart || touchStart.dir) return
+
+  const dx = e.touches[0].clientX - touchStart.x
+  const dy = e.touches[0].clientY - touchStart.y
+
+  if (Math.abs(dx) < DIR_DETECT_PX && Math.abs(dy) < DIR_DETECT_PX) return
+
+  touchStart.dir = Math.abs(dx) > Math.abs(dy)
+    ? (dx > 0 ? 'left' : 'right')
+    : (dy > 0 ? 'up'   : 'down')
+
+  setNavDir(touchStart.dir)
 }
 
 const onTouchEnd = (e) => {
   if (!touchStart) return
+
   const dx       = e.changedTouches[0].clientX - touchStart.x
   const dy       = e.changedTouches[0].clientY - touchStart.y
   const fromPage = touchStart.page
+  const dir      = touchStart.dir
   touchStart = null
 
-  let dir = null
-  if (Math.abs(dx) > Math.abs(dy)) {
-    if (Math.abs(dx) >= SWIPE_THRESHOLD) dir = dx > 0 ? 'left' : 'right'
-  } else {
-    if (Math.abs(dy) >= SWIPE_THRESHOLD) dir = dy > 0 ? 'up' : 'down'
-  }
-
   if (!dir) return
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) < SWIPE_THRESHOLD) return
+  if (Math.abs(dy) >= Math.abs(dx) && Math.abs(dy) < SWIPE_THRESHOLD) return
 
-  setNavDir(dir)   // ← síncrono: la transición CSS ya tiene la dirección correcta
   window.dispatchEvent(new CustomEvent('grid:stop-audio'))
 
-  setTimeout(() => {
+  const isHorizontal = Math.abs(dx) > Math.abs(dy)
+
+  if (isHorizontal) {
+    // ── Horizontal: Slidev tiene handler propio → diferimos y solo
+    //    navegamos si Slidev NO llegó al destino correcto (evita doble go)
+    const target = getTarget(dir, fromPage)
+    setTimeout(() => {
+      if (target !== null && currentPage.value !== target) {
+        go(target)
+      }
+    }, 0)
+  } else {
+    // ── Vertical: Slidev NO tiene handler → navegamos directamente,
+    //    sin setTimeout para evitar el frame de flash
     navigateFrom(dir, fromPage)
-  }, 0)
+  }
 }
 
 // ─── Lifecycle ───────────────────────────────────────────
 onMounted(() => {
   window.addEventListener('keydown',    onKey,        true)
   window.addEventListener('touchstart', onTouchStart, { passive: true })
+  window.addEventListener('touchmove',  onTouchMove,  { passive: true })
   window.addEventListener('touchend',   onTouchEnd,   { passive: true })
 })
 
@@ -141,6 +171,7 @@ onUnmounted(() => {
   clearTimeout(navDirTimer)
   window.removeEventListener('keydown',    onKey,        true)
   window.removeEventListener('touchstart', onTouchStart)
+  window.removeEventListener('touchmove',  onTouchMove)
   window.removeEventListener('touchend',   onTouchEnd)
 })
 </script>
@@ -177,14 +208,12 @@ onUnmounted(() => {
 
 ---
 
-## Resumen del bug y el fix
+## Resumen del fix por caso
 ```
-ANTES (bug):
-  setea data-nav-dir = "right"
-  dot.transitionend (200ms) → borra data-nav-dir   ← demasiado pronto!
-  slide.transition (450ms)  → lee body sin atributo → fade fallback ✗
+Swipe derecha (navegar "left") — horizontal:
+  ANTES: Slidev go(1) ✓ → setTimeout: nuestro go(1) → flash ✗
+  AHORA: Slidev go(1) ✓ → setTimeout: currentPage(1) === target(1) → no-op ✓
 
-AHORA:
-  setNavDir("right") → data-nav-dir = "right"
-  setTimeout(500ms)  → borra data-nav-dir           ← después de los 450ms ✓
-  slide.transition (450ms) → lee "right" → slide-right ✓
+Swipe arriba (navegar "up") — vertical:
+  ANTES: setTimeout(0) → delay de 1 frame → flash del slide origen ✗
+  AHORA: go() inmediato sin setTimeout → sin delay → sin flash ✓
