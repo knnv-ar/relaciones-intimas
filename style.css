@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Linux+Libertine:ital,wght@0,400;0,600;1,400&display=swap');
+
 /*
   ─── Transiciones 2D direccionales ───────────────────────────────────────
   Slidev aplica .grid-nav-enter-active / .grid-nav-leave-active en el
@@ -34,3 +36,19 @@ body[data-nav-dir="up"]    .grid-nav-leave-to   { transform: translateY(100%);  
 /* Estado neutro (sin data-nav-dir): fade simple como fallback */
 body:not([data-nav-dir]) .grid-nav-enter-from,
 body:not([data-nav-dir]) .grid-nav-leave-to { opacity: 0; }
+
+/* ─── Logo SVG en slide de portada ──────────────────────── */
+.slide-logo {
+  display: block;
+  width: 50%;
+  position: absolute;
+  bottom: 4rem;        /* ← acá controlás la distancia al borde inferior */
+  left: 50%;
+  transform: translateX(-50%);
+  filter: none;
+}
+
+/* En modo claro ("Invert" activo) el SVG blanco se invierte a negro */
+html:not(.dark) .slide-logo {
+  filter: invert(1);
+}

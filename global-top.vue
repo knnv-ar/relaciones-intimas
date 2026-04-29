@@ -17,11 +17,12 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useNav } from '@slidev/client'
 
-const COLS = 3
+const COLS = 10
+const ROWS = 5
 
 const { currentPage, go, total } = useNav()
 
-const totalRows   = computed(() => Math.ceil(total.value / COLS))
+const totalRows   = computed(() => Math.max(ROWS, Math.ceil(total.value / COLS)))
 const getPos      = (page) => ({ row: Math.floor((page - 1) / COLS), col: (page - 1) % COLS })
 const getPage     = (row, col) => row * COLS + col + 1
 const isActive    = (row, col) => { const p = getPos(currentPage.value); return p.row === row && p.col === col }

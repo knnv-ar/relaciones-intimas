@@ -3,6 +3,47 @@ title: Relaciones Íntimas
 theme: default
 colorSchema: dark
 transition: grid-nav
+layout: statement
+---
+
+### Luciana Estévez
+
+# Relaciones íntimas
+
+## _Reflexiones artísticas sobre el campo vincular_
+
+<img src="/img/logo.svg" alt="logo" class="slide-logo" />
+
+---
+layout: fullscreen-card
+---
+
+<CatalogCard :scale="0.5" />
+
+##### © 2026, Luciana Estévez
+
+##### © 2026, de la presente edición: Universidad Nacional de las Artes
+
+<br>
+
+##### **Directora del proyecto de investigación:** Luciana Estévez
+
+##### **Codirector del proyecto de investigación:** Raúl Federico Lacabanne
+
+<br>
+
+##### Autores: Ezequiel Abregú, Pedro Antony, Federico Barabino, Mirna Barreiro, Alan Bray, María Eugenia Cappellari,  Luciana Estévez, Laura Figueiras, Ayelén Guarino, Mauricio Gutiérrez, Euge Carla Jerez Ferrante, Julieta Koop, Raúl Federico Lacabanne, María Agustina Mirás, Juan Ramos, Carla Rímola, Natalia Monserrat Rodríguez, Santiago Tula y Sebastián Zavatarelli.
+
+<br>
+
+##### **Diseño editorial:** Raúl Federico Lacabanne
+
+##### **Corrección de estilo:** Liliana Belinco
+
+<br>
+
+
+---
 layout: fullscreen-card
 image: /img/slide-01.jpg
 ---
@@ -67,3 +108,339 @@ image: /img/slide-06.jpg
 Volver no es lo mismo que regresar.
 
 <AudioPlayer src="/audio/slide-06.mp3" />
+
+---
+layout: fullscreen-card
+---
+
+# 09 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 10 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 11 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 12 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 13 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 14 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 15 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 16 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 17 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 18 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 19 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 20 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 21 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 22 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 23 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 24 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 25 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 26 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 27 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 28 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 29 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 30 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 31 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 32 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 33 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 34 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 35 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 36 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 37 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 38 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 39 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 40 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 41 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 42 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 43 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 44 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 45 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 46 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 47 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 48 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 49 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
+
+---
+layout: fullscreen-card
+---
+
+# 50 · Próximamente
+
+El contenido de esta slide se encuentra en desarrollo.
