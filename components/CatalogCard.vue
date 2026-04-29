@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   scale: { type: Number, default: 1 },
@@ -40,31 +40,41 @@ const inner         = ref(null)
 const naturalHeight = ref(0)
 const naturalWidth  = ref(0)
 
+let ro = null
+
 onMounted(() => {
-  naturalHeight.value = inner.value.offsetHeight
-  naturalWidth.value  = inner.value.offsetWidth
+  // ResizeObserver dispara cada vez que el elemento cambia de tamaño,
+  // incluyendo cuando la fuente de Google Fonts llega tarde y produce
+  // un reflow — mucho más confiable que document.fonts.ready con @import.
+  ro = new ResizeObserver(() => {
+    naturalHeight.value = inner.value.offsetHeight
+    naturalWidth.value  = inner.value.offsetWidth
+  })
+  ro.observe(inner.value)
 })
 
-// El outer reserva exactamente el espacio escalado para que
-// el contenido de abajo no se solape
+onUnmounted(() => {
+  ro?.disconnect()
+})
+
 const outerStyle = computed(() => ({
-  height:   naturalHeight.value ? `${naturalHeight.value * props.scale}px` : 'auto',
-  width:    naturalWidth.value  ? `${naturalWidth.value  * props.scale}px` : 'auto',
-  overflow: 'visible',
+  height:     naturalHeight.value ? `${naturalHeight.value * props.scale}px` : 'auto',
+  width:      naturalWidth.value  ? `${naturalWidth.value  * props.scale}px` : 'auto',
+  overflow:   'visible',
   flexShrink: 0,
 }))
 
 const innerStyle = computed(() => ({
   transform:       `scale(${props.scale})`,
-  transformOrigin: 'top left',   // ← ancla en esquina superior izquierda
+  transformOrigin: 'top left',
   display:         'inline-block',
-  width:           '580px',      // ancho fijo del card, no hereda el 100% del padre
+  width:           '580px',
 }))
 </script>
 
 <style scoped>
 .catalog-outer {
-  display: block;   /* bloque normal, fluye a la izquierda naturalmente */
+  display: block;
 }
 
 .catalog-inner {
