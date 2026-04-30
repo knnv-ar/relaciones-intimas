@@ -55,8 +55,8 @@ html:not(.dark) .slide-logo {
 
 /* ─── Texto de créditos debajo del CatalogCard ──────────── */
 .credits {
-  font-size: 0.6rem;   /* ← acá controlás el tamaño de todo el bloque */
-  line-height: 1.0;
+  font-size: 0.9rem;   /* ← acá controlás el tamaño de todo el bloque */
+  line-height: 1.4;
 }
 
 .credits p,

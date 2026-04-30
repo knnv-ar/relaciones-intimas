@@ -15,10 +15,12 @@ layout: statement
 <img src="/img/logo.svg" alt="logo" class="slide-logo" />
 
 ---
-layout: fullscreen-card
+layout: fullscreen-two-cols
 ---
 
-<CatalogCard :scale="0.6" />
+::left::
+
+<CatalogCard :scale="0.74" />
 
 <div class="credits">
 
@@ -30,7 +32,7 @@ layout: fullscreen-card
 
 <br>
 
-**Departamento de Artes Dramáticas** (Universidad Nacional de las Artes). French 3614. C1425AXD. Ciudad Autónoma de Buenos Aires. Teléfono: (54.11) 4962-6044. URL: https://dramaticas.una.edu.ar
+**Departamento de Artes Dramáticas** (Universidad Nacional de las Artes). French 3614. C1425AXD. Ciudad Autónoma de Buenos Aires. Teléfono: (54.11) 4962-6044. https://dramaticas.una.edu.ar
 
 <br>
 
@@ -38,7 +40,11 @@ layout: fullscreen-card
 
 **Codirector del proyecto de investigación:** Raúl Federico Lacabanne
 
-<br>
+</div>
+
+::right::
+
+<div class="credits">
 
 **Autores:** Ezequiel Abregú, Pedro Antony, Federico Barabino, Mirna Barreiro, Alan Bray, María Eugenia Cappellari, Luciana Estévez, Laura Figueiras, Ayelén Guarino, Mauricio Gutiérrez, Euge Carla Jerez Ferrante, Julieta Koop, Raúl Federico Lacabanne, María Agustina Mirás, Juan Ramos, Carla Rímola, Natalia Monserrat Rodríguez, Santiago Tula y Sebastián Zavatarelli.
 
@@ -46,20 +52,133 @@ layout: fullscreen-card
 
 **Diseño editorial:** Raúl Federico Lacabanne
 
-**Corrección de estilo:** Liliana Belinco
+**Corrección:** Liliana Belinco
 
-<br>
+<br><br>
 
 Queda hecho el depósito que marca la Ley 11.723.
 
 <br>
 
-No se permite la reproducción total o parcial de este libro, en cualquier forma o por cualquier medio,<br>sin el permiso previo y por escrito de los titulares del copyright.
+No se permite la reproducción total o parcial de este libro, en cualquier forma o por cualquier medio, sin el permiso previo y por escrito de los titulares del copyright.
+
+<br><br>
+
+**Hecho en Argentina con ❤️**
+
+</div>
+
+---
+layout: fullscreen-two-cols
+---
+
+::left::
+
+<div class="credits">
+
+AUTORIDADES
+
+UNIVERSIDAD NACIONAL DE LAS ARTES
 
 <br>
 
-**Hecho en Argentina**
+_Rectora_
 
+**Sandra Torlucci**
+
+<br>
+
+_Vicerrectora_
+
+**Diana Piazza**
+
+<br>
+
+_Secretario General_
+
+**Alejandro Ades**
+
+<br>
+
+_Secretaria de Asuntos Académicos_
+
+**Yamila Volnovich**
+
+<br>
+
+_Secretaria de Investigación y Posgrado_
+
+**María Valdez**
+
+<br>
+
+_Secretaria de Extensión Cultural y Bienestar Estudiantil_
+
+**Cecilia Tosoratti**
+
+</div>
+
+::right::
+
+<div class="credits">
+
+AUTORIDADES
+
+DEPARTAMENTO DE ARTES DRAMÁTICAS
+
+<br>
+
+_Decano Director_
+
+**Sergio Sabater**
+
+<br>
+
+_Secretaria Académica_
+
+**Patricia Vignolo**
+
+<br>
+
+_Coordinador Académico_
+
+**Alejandro Rozenholc**
+
+<br>
+
+_Secretaria de Investigación y Posgrado_
+
+**Luciana Estévez**
+
+<br>
+
+_Prosecretaria de Investigación y Posgrado_
+
+**Silvana Franco**
+
+<br>
+
+_Secretaria de Extensión Cultural y Bienestar Estudiantil_
+
+**Mayra Carlos**
+
+</div>
+
+---
+layout: fullscreen-two-cols
+---
+
+::left::
+
+<div class="credits">
+
+ÍNDICE
+
+</div>
+
+::right::
+
+<div class="credits">
 </div>
 
 ---
@@ -127,22 +246,6 @@ image: /img/slide-06.jpg
 Volver no es lo mismo que regresar.
 
 <AudioPlayer src="/audio/slide-06.mp3" />
-
----
-layout: fullscreen-card
----
-
-# 09 · Próximamente
-
-El contenido de esta slide se encuentra en desarrollo.
-
----
-layout: fullscreen-card
----
-
-# 10 · Próximamente
-
-El contenido de esta slide se encuentra en desarrollo.
 
 ---
 layout: fullscreen-card
